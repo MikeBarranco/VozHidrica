@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Droplet, History, ChevronDown, ChevronUp } from 'lucide-react';
+import { Droplet, History, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { generateSampleWaterData } from '../utils/sampleDataGenerator';
 
 export default function WaterCampaignPage() {
+  const navigate = useNavigate();
   const [showProblem, setShowProblem] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showMeterPopup, setShowMeterPopup] = useState(false);
@@ -12,6 +13,14 @@ export default function WaterCampaignPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-cyan-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <button
+          onClick={() => navigate('/home')}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6"
+          aria-label="Volver al inicio"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
+        </button>
+
         <div className="text-center mb-12">
           <div className="inline-block bg-white rounded-full p-6 shadow-xl mb-6">
             <Droplet className="w-20 h-20 text-cyan-500" />

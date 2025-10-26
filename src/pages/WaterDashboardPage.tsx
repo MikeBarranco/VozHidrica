@@ -37,29 +37,31 @@ export default function WaterDashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <button
-              onClick={() => navigate('/home')}
-              className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 mb-4 font-gotham font-medium text-14"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Volver al inicio
-            </button>
-            <h1 className="font-gotham font-bold text-36 text-gray-900 mb-2">
-              Mi Panel de Agua
-            </h1>
-            <p className="font-gotham font-book text-16 text-gray-600">
-              Monitorea tu consumo y forma hábitos sostenibles
-            </p>
-          </div>
+        <div className="mb-8">
           <button
-            onClick={() => setShowAddModal(true)}
-            className="bg-cyan-600 text-white px-6 py-3 rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2 font-gotham font-bold text-14"
+            onClick={() => navigate('/home')}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4"
+            aria-label="Volver al inicio"
           >
-            <Plus className="w-5 h-5" />
-            Registrar Consumo
+            <ArrowLeft className="w-5 h-5 text-gray-700" />
           </button>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="font-gotham font-bold text-36 text-gray-900 mb-2">
+                Mi Panel de Agua
+              </h1>
+              <p className="font-gotham font-book text-16 text-gray-600">
+                Monitorea tu consumo y forma hábitos sostenibles
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="bg-cyan-600 text-white px-6 py-3 rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2 font-gotham font-bold text-14"
+            >
+              <Plus className="w-5 h-5" />
+              Registrar Consumo
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

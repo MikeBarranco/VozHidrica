@@ -157,7 +157,7 @@ export function useWaterTracking() {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    return consumption
+    const total = consumption
       .filter((c) => {
         const date = new Date(c.consumption_date);
         return (
@@ -165,6 +165,8 @@ export function useWaterTracking() {
         );
       })
       .reduce((sum, c) => sum + Number(c.cubic_meters), 0);
+
+    return Number(total.toFixed(2));
   };
 
   const getLastMonthConsumption = (): number => {
@@ -173,7 +175,7 @@ export function useWaterTracking() {
     const lastMonthYear =
       now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-    return consumption
+    const total = consumption
       .filter((c) => {
         const date = new Date(c.consumption_date);
         return (
@@ -181,6 +183,8 @@ export function useWaterTracking() {
         );
       })
       .reduce((sum, c) => sum + Number(c.cubic_meters), 0);
+
+    return Number(total.toFixed(2));
   };
 
   const getMonthlyConsumptionTrend = (months: number = 7) => {
@@ -202,7 +206,7 @@ export function useWaterTracking() {
 
       result.push({
         month: monthName.charAt(0).toUpperCase() + monthName.slice(1),
-        value: total,
+        value: Number(total.toFixed(2)),
       });
     }
 

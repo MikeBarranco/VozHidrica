@@ -20,10 +20,10 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 mb-6 font-gotham font-medium text-14"
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6"
+          aria-label="Volver al inicio"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Volver al inicio
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
         </button>
         <h1 className="font-gotham font-bold text-32 text-gray-900 mb-8">
           Panel de Control

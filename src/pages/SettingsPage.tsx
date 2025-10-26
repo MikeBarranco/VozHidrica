@@ -1,14 +1,24 @@
-import { User, Bell, Shield, Globe, Mic } from 'lucide-react';
+import { User, Bell, Shield, Globe, Mic, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useVoice } from '../contexts/VoiceContext';
 
 export default function SettingsPage() {
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { language, setLanguage, isActive } = useVoice();
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
+        <button
+          onClick={() => navigate('/home')}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4"
+          aria-label="Volver al inicio"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
+        </button>
+
         <h1 className="font-gotham font-bold text-32 text-gray-900 mb-8">
           Configuración
         </h1>
