@@ -1,5 +1,28 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 
+interface SpeechSynthesisUtterance {
+  text: string;
+  lang: string;
+  rate: number;
+  pitch: number;
+  volume: number;
+  onend: (() => void) | null;
+  onerror: ((event: any) => void) | null;
+}
+
+interface SpeechSynthesis {
+  speak: (utterance: any) => void;
+  cancel: () => void;
+  speaking: boolean;
+}
+
+declare global {
+  interface Window {
+    speechSynthesis: SpeechSynthesis;
+    SpeechSynthesisUtterance: new () => SpeechSynthesisUtterance;
+  }
+}
+
 interface GeminiResponse {
   intent: 'navigate' | 'read' | 'query';
   route?: string;
@@ -39,6 +62,37 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
   const recognitionRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const playAudioFallback = useCallback((text: string, lang: 'es' | 'en') => {
+    return new Promise<void>((resolve, reject) => {
+      if (!('speechSynthesis' in window)) {
+        reject(new Error('Speech synthesis not supported'));
+        return;
+      }
+
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new window.SpeechSynthesisUtterance(text);
+        utterance.lang = lang === 'es' ? 'es-ES' : 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        utterance.onend = () => {
+          resolve();
+        };
+
+        utterance.onerror = (event) => {
+          console.error('Speech synthesis error:', event);
+          reject(event);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }, []);
+
   const playAudio = useCallback(async (text: string, lang: 'es' | 'en' = language) => {
     if (!text || isSpeaking) return;
 
@@ -59,7 +113,13 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to generate speech');
+        console.warn('ElevenLabs API failed, using fallback speech synthesis');
+        await playAudioFallback(text, lang);
+        setIsSpeaking(false);
+        if (isActive) {
+          setTimeout(() => startListening(), 500);
+        }
+        return;
       }
 
       const audioBlob = await response.blob();
@@ -81,9 +141,15 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         }
       };
 
-      audio.onerror = () => {
+      audio.onerror = async () => {
         setIsSpeaking(false);
         URL.revokeObjectURL(audioUrl);
+        console.warn('Audio playback failed, using fallback');
+        try {
+          await playAudioFallback(text, lang);
+        } catch (fallbackError) {
+          console.error('Fallback also failed:', fallbackError);
+        }
         if (isActive) {
           setTimeout(() => startListening(), 500);
         }
@@ -92,12 +158,17 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       await audio.play();
     } catch (error) {
       console.error('Error playing audio:', error);
+      try {
+        await playAudioFallback(text, lang);
+      } catch (fallbackError) {
+        console.error('Fallback speech synthesis failed:', fallbackError);
+      }
       setIsSpeaking(false);
       if (isActive) {
         setTimeout(() => startListening(), 500);
       }
     }
-  }, [language, isSpeaking, isActive]);
+  }, [language, isSpeaking, isActive, playAudioFallback]);
 
   const processTranscript = useCallback(async (text: string) => {
     if (!text.trim()) return;
@@ -135,7 +206,11 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
     if (!isActive || isListening || isSpeaking) return;
 
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      console.error('Speech recognition not supported');
+      console.error('Speech recognition not supported in this browser');
+      const errorMsg = language === 'es'
+        ? 'Tu navegador no soporta reconocimiento de voz. Usa Chrome, Edge o Safari.'
+        : 'Your browser does not support speech recognition. Please use Chrome, Edge, or Safari.';
+      setSpeechResponse(errorMsg);
       return;
     }
 

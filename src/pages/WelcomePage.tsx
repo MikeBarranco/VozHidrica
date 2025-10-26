@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useVoice } from '../contexts/VoiceContext';
+import { useToast } from '../contexts/ToastContext';
+import { requestMicrophonePermission, checkMicrophoneSupport } from '../utils/microphonePermissions';
 import Button from '../components/Button';
 
 interface WelcomePageProps {
@@ -7,6 +10,47 @@ interface WelcomePageProps {
 
 export default function WelcomePage({ onContinue }: WelcomePageProps) {
   const [videoError, setVideoError] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
+  const { toggleActive, playAudio, language } = useVoice();
+  const toast = useToast();
+
+  const handleMeetHidri = async () => {
+    setIsActivating(true);
+
+    const supportCheck = checkMicrophoneSupport();
+    if (!supportCheck.supported) {
+      toast.error(supportCheck.error || 'El asistente de voz no está disponible');
+      setIsActivating(false);
+      return;
+    }
+
+    const permissionResult = await requestMicrophonePermission();
+    if (!permissionResult.granted) {
+      toast.error(permissionResult.error || 'No se pudo acceder al micrófono');
+      setIsActivating(false);
+      return;
+    }
+
+    try {
+      toggleActive();
+
+      const welcomeMessage = language === 'es'
+        ? '¡Hola! Soy Hidri, tu asistente de Voz Hídrica. Estoy aquí para ayudarte a gestionar tu consumo de agua y ganar recompensas. ¿En qué puedo ayudarte hoy?'
+        : 'Hello! I am Hidri, your Voz Hídrica assistant. I am here to help you manage your water consumption and earn rewards. How can I help you today?';
+
+      await playAudio(welcomeMessage, language);
+      toast.success('Asistente de voz activado');
+
+      setTimeout(() => {
+        onContinue();
+      }, 1000);
+    } catch (error) {
+      console.error('Error activating voice assistant:', error);
+      toast.error('Error al activar el asistente de voz');
+    } finally {
+      setIsActivating(false);
+    }
+  };
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -99,8 +143,8 @@ export default function WelcomePage({ onContinue }: WelcomePageProps) {
       </div>
 
       <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 lg:bottom-30 lg:right-30 z-10">
-        <Button variant="welcome" onClick={onContinue}>
-          Conoce a Hidri
+        <Button variant="welcome" onClick={handleMeetHidri} disabled={isActivating}>
+          {isActivating ? 'Activando...' : 'Conoce a Hidri'}
         </Button>
       </div>
     </div>

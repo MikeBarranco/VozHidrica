@@ -6,6 +6,7 @@ import { useEcoPoints } from '../hooks/useEcoPoints';
 import { useWaterTracking } from '../hooks/useWaterTracking';
 import Carousel from '../components/Carousel';
 import SocialLinksBar from '../components/SocialLinksBar';
+import { SkeletonBanner, SkeletonCard } from '../components/SkeletonLoader';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -186,13 +187,13 @@ export default function HomePage() {
           </div>
 
           {bannersLoading ? (
-            <div className="w-full h-64 md:h-96 bg-gray-200 rounded-lg animate-pulse"></div>
+            <SkeletonBanner />
           ) : (
             <Carousel banners={banners} />
           )}
 
           {linksLoading ? (
-            <div className="bg-white rounded-lg shadow-md p-6 h-32 animate-pulse"></div>
+            <SkeletonCard />
           ) : (
             <SocialLinksBar links={links} />
           )}

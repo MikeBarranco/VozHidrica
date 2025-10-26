@@ -1,21 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { VoiceProvider, useVoice } from './contexts/VoiceContext';
+import { ToastProvider } from './contexts/ToastContext';
 import VoiceAssistant from './components/VoiceAssistant';
 import VoiceControlButton from './components/VoiceControlButton';
-import LandingPage from './pages/LandingPage';
-import AuthPage from './pages/AuthPage';
-import HomePage from './pages/HomePage';
-import DashboardPage from './pages/DashboardPage';
-import RewardsPage from './pages/RewardsPage';
-import GreenCreditPage from './pages/GreenCreditPage';
-import SavingsPage from './pages/SavingsPage';
-import SettingsPage from './pages/SettingsPage';
-import WaterCampaignPage from './pages/WaterCampaignPage';
-import WaterDashboardPage from './pages/WaterDashboardPage';
-import FinancialEducationPage from './pages/FinancialEducationPage';
-import ChallengesPage from './pages/ChallengesPage';
+
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const RewardsPage = lazy(() => import('./pages/RewardsPage'));
+const GreenCreditPage = lazy(() => import('./pages/GreenCreditPage'));
+const SavingsPage = lazy(() => import('./pages/SavingsPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const WaterCampaignPage = lazy(() => import('./pages/WaterCampaignPage'));
+const WaterDashboardPage = lazy(() => import('./pages/WaterDashboardPage'));
+const FinancialEducationPage = lazy(() => import('./pages/FinancialEducationPage'));
+const ChallengesPage = lazy(() => import('./pages/ChallengesPage'));
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-[#EB0029] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="font-gotham font-medium text-15 text-gray-700">Cargando...</p>
+      </div>
+    </div>
+  );
+}
 
 function VoiceNavigationHandler() {
   const navigate = useNavigate();
@@ -61,7 +74,8 @@ function AppContent() {
       <VoiceAssistant />
       <VoiceNavigationHandler />
       <VoiceControlButton />
-      <Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route
@@ -144,7 +158,8 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-      </Routes>
+        </Routes>
+      </Suspense>
     </>
   );
 }
@@ -153,9 +168,11 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <VoiceProvider>
-          <AppContent />
-        </VoiceProvider>
+        <ToastProvider>
+          <VoiceProvider>
+            <AppContent />
+          </VoiceProvider>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   );

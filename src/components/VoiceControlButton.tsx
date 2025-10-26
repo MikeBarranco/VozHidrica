@@ -62,26 +62,27 @@ export default function VoiceControlButton() {
         <button
           onClick={toggleActive}
           className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full shadow-lg transition-all duration-300 text-sm font-medium"
+          aria-label="Detener asistente de voz"
         >
-          <Square className="w-4 h-4" />
+          <Square className="w-4 h-4" aria-hidden="true" />
           Detener Asistente
         </button>
       )}
 
       {isActive && (isListening || isSpeaking) && (
-        <div className="bg-white rounded-lg shadow-xl p-4 max-w-xs">
+        <div className="bg-white rounded-lg shadow-xl p-4 max-w-xs" role="status" aria-live="polite">
           <div className="flex items-center gap-2 mb-2">
             {isSpeaking ? (
-              <Volume2 className="w-5 h-5 text-blue-500" />
+              <Volume2 className="w-5 h-5 text-blue-500" aria-hidden="true" />
             ) : (
-              <Mic className="w-5 h-5 text-red-500" />
+              <Mic className="w-5 h-5 text-red-500" aria-hidden="true" />
             )}
             <span className="text-sm font-medium text-gray-700">
               {isSpeaking ? 'Hidra habla' : 'Te escucho'}
             </span>
           </div>
           {isSpeaking && (
-            <div className="flex gap-1 items-center justify-center h-8">
+            <div className="flex gap-1 items-center justify-center h-8" aria-label="Visualización de audio">
               <div className="w-1 bg-blue-500 rounded-full animate-waveform-1" style={{ height: '20px' }}></div>
               <div className="w-1 bg-blue-500 rounded-full animate-waveform-2" style={{ height: '30px' }}></div>
               <div className="w-1 bg-blue-500 rounded-full animate-waveform-3" style={{ height: '25px' }}></div>
@@ -90,7 +91,7 @@ export default function VoiceControlButton() {
             </div>
           )}
           {isListening && (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center" aria-label="Micrófono activo">
               <div className="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
             </div>
           )}
