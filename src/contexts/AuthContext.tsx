@@ -3,16 +3,18 @@ import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
 interface UserProfile {
+  username: string;
   fullName: string;
   curp: string;
   address: string;
+  email: string;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, profile: UserProfile) => Promise<{ error: string | null }>;
+  signIn: (username: string, password: string) => Promise<{ error: string | null }>;
+  signUp: (password: string, profile: UserProfile) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -37,18 +39,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (username: string, password: string) => {
     try {
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('email')
+        .eq('username', username)
+        .maybeSingle();
+
+      if (profileError || !profileData) {
+        return { error: 'Nombre de usuario o contraseña incorrectos' };
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: profileData.email,
         password,
       });
 
       if (error) {
-        if (error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
-          return { error: 'El correo electrónico no está registrado' };
-        }
-        return { error: 'Correo electrónico o contraseña incorrectos' };
+        return { error: 'Nombre de usuario o contraseña incorrectos' };
       }
 
       if (data.user) {
@@ -61,10 +70,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, profile: UserProfile) => {
+  const signUp = async (password: string, profile: UserProfile) => {
     try {
+      const { data: existingUsername } = await supabase
+        .from('user_profiles')
+        .select('username')
+        .eq('username', profile.username)
+        .maybeSingle();
+
+      if (existingUsername) {
+        return { error: 'Este nombre de usuario ya está en uso' };
+      }
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: profile.email,
         password,
       });
 
@@ -78,7 +97,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         await supabase.from('user_profiles').insert({
           user_id: data.user.id,
-          email: data.user.email,
+          username: profile.username,
+          email: profile.email,
           full_name: profile.fullName,
           curp: profile.curp,
           address: profile.address,

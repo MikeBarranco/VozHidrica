@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,6 +14,7 @@ export default function AuthPage() {
   const [curp, setCurp] = useState('');
   const [address, setAddress] = useState('');
   const [errors, setErrors] = useState<{
+    username?: string;
     email?: string;
     password?: string;
     confirmPassword?: string;
@@ -32,6 +34,11 @@ export default function AuthPage() {
     return emailRegex.test(email);
   };
 
+  const validateUsername = (username: string) => {
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    return usernameRegex.test(username);
+  };
+
   const validateCURP = (curp: string) => {
     const curpRegex = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
     return curpRegex.test(curp.toUpperCase());
@@ -40,10 +47,10 @@ export default function AuthPage() {
   const validateForm = () => {
     const newErrors: typeof errors = {};
 
-    if (!email) {
-      newErrors.email = 'El campo es obligatorio';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Ingresa un correo electrónico válido';
+    if (!username) {
+      newErrors.username = 'El campo es obligatorio';
+    } else if (!validateUsername(username)) {
+      newErrors.username = 'Solo letras, números y guion bajo (3-20 caracteres)';
     }
 
     if (!password) {
@@ -55,6 +62,12 @@ export default function AuthPage() {
     if (!isLogin) {
       if (!fullName) {
         newErrors.fullName = 'El nombre completo es obligatorio';
+      }
+
+      if (!email) {
+        newErrors.email = 'El campo es obligatorio';
+      } else if (!validateEmail(email)) {
+        newErrors.email = 'Ingresa un correo electrónico válido';
       }
 
       if (!curp) {
@@ -90,14 +103,16 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(username, password);
         if (error) {
           setErrors({ general: error });
         } else {
           navigate('/home');
         }
       } else {
-        const { error } = await signUp(email, password, {
+        const { error } = await signUp(password, {
+          username,
+          email,
           fullName,
           curp: curp.toUpperCase(),
           address,
@@ -115,6 +130,7 @@ export default function AuthPage() {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    setUsername('');
     setEmail('');
     setPassword('');
     setConfirmPassword('');
@@ -125,7 +141,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center px-6 sm:px-20 py-10">
+    <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
       {!videoError ? (
         <video
           autoPlay
@@ -149,145 +165,150 @@ export default function AuthPage() {
         <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-gray-900 via-blue-900 to-black" />
       )}
 
-      <div className="fixed inset-0 bg-black bg-opacity-40" />
+      <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="mb-30 text-center bg-white bg-opacity-95 rounded-xl p-6 backdrop-blur-sm">
-          <h1 className="font-gotham font-bold text-32 sm:text-36 md:text-40 text-primary mb-10">
-            Voz Hídrica
-          </h1>
-          <svg
-            width="150"
-            height="40"
-            viewBox="0 0 150 40"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="mx-auto"
-          >
-            <text
-              x="75"
-              y="25"
-              textAnchor="middle"
-              fill="#EB0029"
-              fontSize="20"
-              fontWeight="bold"
-              fontFamily="Arial, sans-serif"
-            >
-              BANORTE
-            </text>
-          </svg>
-        </div>
+      <div className="relative z-10 w-full max-w-md lg:max-w-lg">
+        <div className="mb-6 lg:mb-10">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 lg:p-8 border border-white/20 shadow-2xl">
+            <div className="flex items-center justify-center gap-4 lg:gap-6 mb-6">
+              <div className="flex-1 flex justify-end">
+                <div className="w-28 h-12 sm:w-32 sm:h-14 lg:w-40 lg:h-16 bg-white/90 rounded-lg flex items-center justify-center shadow-lg">
+                  <div className="text-banorte-red font-bold text-xl sm:text-2xl lg:text-3xl tracking-tight">
+                    BANORTE
+                  </div>
+                </div>
+              </div>
 
-        <div className="flex justify-center mb-30">
-          <div className="tabs-container">
-            <input
-              type="radio"
-              name="auth_tab"
-              id="login_tab"
-              checked={isLogin}
-              onChange={() => !isLogin && toggleMode()}
-              className="tab-input"
-            />
-            <label htmlFor="login_tab" className="tab-label">
-              Iniciar Sesión
-            </label>
-            <input
-              type="radio"
-              name="auth_tab"
-              id="register_tab"
-              checked={!isLogin}
-              onChange={() => isLogin && toggleMode()}
-              className="tab-input"
-            />
-            <label htmlFor="register_tab" className="tab-label">
-              Registrarse
-            </label>
-          </div>
-        </div>
+              <div className="w-px h-12 sm:h-14 lg:h-16 bg-white/30"></div>
 
-        <form onSubmit={handleSubmit} className="space-y-20 max-h-[65vh] overflow-y-auto pr-2">
-          {!isLogin && (
-            <InputField
-              label="Nombre Completo"
-              type="text"
-              value={fullName}
-              onChange={setFullName}
-              placeholder="Juan Pérez García"
-              error={errors.fullName}
-            />
-          )}
-
-          <InputField
-            label="Correo electrónico"
-            type="email"
-            value={email}
-            onChange={setEmail}
-            placeholder="ejemplo@correo.com"
-            error={errors.email}
-          />
-
-          {!isLogin && (
-            <>
-              <InputField
-                label="CURP"
-                type="text"
-                value={curp}
-                onChange={(value) => setCurp(value.toUpperCase())}
-                placeholder="HEGJ880101HDFRRL09"
-                error={errors.curp}
-                maxLength={18}
-              />
-
-              <InputField
-                label="Dirección"
-                type="text"
-                value={address}
-                onChange={setAddress}
-                placeholder="Calle 123, Colonia, Ciudad, CP"
-                error={errors.address}
-              />
-            </>
-          )}
-
-          <InputField
-            label="Contraseña"
-            type="password"
-            value={password}
-            onChange={setPassword}
-            placeholder="Ingresa tu contraseña"
-            error={errors.password}
-          />
-
-          {!isLogin && (
-            <InputField
-              label="Confirmar contraseña"
-              type="password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              placeholder="Confirma tu contraseña"
-              error={errors.confirmPassword}
-            />
-          )}
-
-          {errors.general && (
-            <div className="p-15 bg-red-50 rounded">
-              <p className="font-gotham font-book text-12 text-text-error text-center">
-                {errors.general}
-              </p>
+              <div className="flex-1 flex justify-start">
+                <div className="w-28 h-12 sm:w-32 sm:h-14 lg:w-40 lg:h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <div className="text-white font-bold text-sm sm:text-base lg:text-lg text-center px-2">
+                    Voz Hídrica
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
-
-          <div className="pt-20">
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? 'Cargando...' : 'Continuar'}
-            </Button>
           </div>
-        </form>
+        </div>
+
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+          <div className="flex border-b border-gray-200">
+            <button
+              onClick={() => !isLogin && toggleMode()}
+              className={`flex-1 py-4 lg:py-5 text-center font-gotham font-medium text-14 lg:text-15 transition-all duration-300 ${
+                isLogin
+                  ? 'bg-banorte-red text-white'
+                  : 'bg-white text-text-secondary hover:bg-gray-50'
+              }`}
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              onClick={() => isLogin && toggleMode()}
+              className={`flex-1 py-4 lg:py-5 text-center font-gotham font-medium text-14 lg:text-15 transition-all duration-300 ${
+                !isLogin
+                  ? 'bg-banorte-red text-white'
+                  : 'bg-white text-text-secondary hover:bg-gray-50'
+              }`}
+            >
+              Registrarse
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-6 lg:p-8 space-y-5 lg:space-y-6 max-h-[60vh] lg:max-h-[65vh] overflow-y-auto">
+            {!isLogin && (
+              <InputField
+                label="Nombre Completo"
+                type="text"
+                value={fullName}
+                onChange={setFullName}
+                placeholder="Juan Pérez García"
+                error={errors.fullName}
+              />
+            )}
+
+            <InputField
+              label="Nombre de usuario"
+              type="text"
+              value={username}
+              onChange={setUsername}
+              placeholder="usuario123"
+              error={errors.username}
+            />
+
+            {!isLogin && (
+              <>
+                <InputField
+                  label="Correo electrónico"
+                  type="email"
+                  value={email}
+                  onChange={setEmail}
+                  placeholder="ejemplo@correo.com"
+                  error={errors.email}
+                />
+
+                <InputField
+                  label="CURP"
+                  type="text"
+                  value={curp}
+                  onChange={(value) => setCurp(value.toUpperCase())}
+                  placeholder="HEGJ880101HDFRRL09"
+                  error={errors.curp}
+                  maxLength={18}
+                />
+
+                <InputField
+                  label="Dirección"
+                  type="text"
+                  value={address}
+                  onChange={setAddress}
+                  placeholder="Calle 123, Colonia, Ciudad, CP"
+                  error={errors.address}
+                />
+              </>
+            )}
+
+            <InputField
+              label="Contraseña"
+              type="password"
+              value={password}
+              onChange={setPassword}
+              placeholder="Ingresa tu contraseña"
+              error={errors.password}
+            />
+
+            {!isLogin && (
+              <InputField
+                label="Confirmar contraseña"
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                placeholder="Confirma tu contraseña"
+                error={errors.confirmPassword}
+              />
+            )}
+
+            {errors.general && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="font-gotham font-book text-12 lg:text-14 text-banorte-red text-center">
+                  {errors.general}
+                </p>
+              </div>
+            )}
+
+            <div className="pt-4">
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={isLoading}
+                className="w-full"
+              >
+                {isLoading ? 'Cargando...' : 'Continuar'}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
