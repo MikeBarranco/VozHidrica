@@ -2,7 +2,17 @@ import { Mic, MicOff, Volume2, Square } from 'lucide-react';
 import { useVoice } from '../contexts/VoiceContext';
 
 export default function VoiceControlButton() {
-  const { isActive, isListening, isSpeaking, toggleActive, language } = useVoice();
+  const {
+    isActive,
+    isListening,
+    isSpeaking,
+    toggleActive,
+    language,
+    currentTurn,
+    maxTurns,
+    volumeLevel,
+    transcript
+  } = useVoice();
 
   const translations = {
     es: {
@@ -17,6 +27,8 @@ export default function VoiceControlButton() {
       ariaStopVoice: 'Detener asistente de voz',
       audioVisualization: 'Visualización de audio',
       micActive: 'Micrófono activo',
+      turnCounter: 'Turno',
+      of: 'de',
     },
     en: {
       activate: 'Activate Assistant',
@@ -30,6 +42,8 @@ export default function VoiceControlButton() {
       ariaStopVoice: 'Stop voice assistant',
       audioVisualization: 'Audio visualization',
       micActive: 'Microphone active',
+      turnCounter: 'Turn',
+      of: 'of',
     },
   };
 
@@ -90,14 +104,38 @@ export default function VoiceControlButton() {
       </div>
 
       {isActive && (
-        <button
-          onClick={toggleActive}
-          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg transition-all duration-300 text-xs sm:text-sm font-medium"
-          aria-label={t.ariaStopVoice}
-        >
-          <Square className="w-3 h-3 sm:w-4 sm:h-4" aria-hidden="true" />
-          <span className="hidden xs:inline">{t.stop}</span>
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          <div className="bg-white rounded-full px-4 py-2 shadow-lg">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {Array.from({ length: maxTurns }).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index < currentTurn
+                        ? 'bg-green-500'
+                        : index === currentTurn
+                        ? 'bg-blue-500 animate-pulse'
+                        : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs font-medium text-gray-700">
+                {currentTurn}/{maxTurns}
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={toggleActive}
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg transition-all duration-300 text-xs sm:text-sm font-medium"
+            aria-label={t.ariaStopVoice}
+          >
+            <Square className="w-3 h-3 sm:w-4 sm:h-4" aria-hidden="true" />
+            <span className="hidden xs:inline">{t.stop}</span>
+          </button>
+        </div>
       )}
 
       {isActive && (isListening || isSpeaking) && (
@@ -109,9 +147,21 @@ export default function VoiceControlButton() {
               <Mic className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" aria-hidden="true" />
             )}
             <span className="text-xs sm:text-sm font-medium text-gray-700">
-              {isSpeaking ? t.hidriSpeaks : ''}
+              {isSpeaking ? t.hidriSpeaks : t.listening}
             </span>
           </div>
+
+          {isListening && volumeLevel > 0 && (
+            <div className="mb-2">
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-green-400 to-red-500 transition-all duration-100"
+                  style={{ width: `${volumeLevel}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {isSpeaking && (
             <div className="flex gap-1 items-center justify-center h-6 sm:h-8" aria-label={t.audioVisualization}>
               <div className="w-1 bg-blue-500 rounded-full animate-waveform-1" style={{ height: '15px' }}></div>
@@ -121,9 +171,16 @@ export default function VoiceControlButton() {
               <div className="w-1 bg-blue-500 rounded-full animate-waveform-1" style={{ height: '15px' }}></div>
             </div>
           )}
-          {isListening && (
+
+          {isListening && !isSpeaking && (
             <div className="flex items-center justify-center" aria-label={t.micActive}>
               <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {transcript && isListening && (
+            <div className="mt-2 text-xs text-gray-600 italic line-clamp-2">
+              "{transcript}"
             </div>
           )}
         </div>

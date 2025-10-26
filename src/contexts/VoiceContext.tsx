@@ -1,10 +1,18 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { useVoiceActivityDetection } from '../hooks/useVoiceActivityDetection';
+import { useVoicePreferences } from '../hooks/useVoicePreferences';
 
 interface GeminiResponse {
   intent: 'navigate' | 'read' | 'query';
   route?: string;
   emotion: 'happy' | 'calm' | 'helpful';
   speech: string;
+}
+
+interface ConversationMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
 }
 
 interface VoiceContextType {
@@ -16,6 +24,10 @@ interface VoiceContextType {
   speechResponse: string;
   currentPage: string;
   geminiResponse: GeminiResponse | null;
+  conversationHistory: ConversationMessage[];
+  currentTurn: number;
+  maxTurns: number;
+  volumeLevel: number;
   setLanguage: (lang: 'es' | 'en') => void;
   setCurrentPage: (page: string) => void;
   startListening: () => void;
@@ -35,9 +47,48 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
   const [speechResponse, setSpeechResponse] = useState('');
   const [currentPage, setCurrentPage] = useState('/');
   const [geminiResponse, setGeminiResponse] = useState<GeminiResponse | null>(null);
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
+  const [currentTurn, setCurrentTurn] = useState(0);
+  const [volumeLevel, setVolumeLevel] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const interimTranscriptRef = useRef<string>('');
+  const shouldProcessRef = useRef<boolean>(false);
+
+  const { preferences, loading: preferencesLoading } = useVoicePreferences();
+  const maxTurns = preferences.max_turns;
+
+  const handleSpeechStart = useCallback(() => {
+    if (isActive && !isSpeaking && !isProcessing) {
+      shouldProcessRef.current = true;
+      interimTranscriptRef.current = '';
+    }
+  }, [isActive, isSpeaking, isProcessing]);
+
+  const handleSpeechEnd = useCallback(() => {
+    if (shouldProcessRef.current && interimTranscriptRef.current.trim()) {
+      const textToProcess = interimTranscriptRef.current.trim();
+      shouldProcessRef.current = false;
+      interimTranscriptRef.current = '';
+
+      setTranscript(textToProcess);
+      processTranscript(textToProcess);
+    }
+  }, []);
+
+  const handleVolumeChange = useCallback((volume: number) => {
+    setVolumeLevel(volume);
+  }, []);
+
+  const vad = useVoiceActivityDetection({
+    sensitivity: preferences.vad_sensitivity,
+    silenceThreshold: preferences.silence_threshold,
+    onSpeechStart: handleSpeechStart,
+    onSpeechEnd: handleSpeechEnd,
+    onVolumeChange: handleVolumeChange,
+  });
 
   const playAudioFallback = useCallback((text: string, lang: 'es' | 'en') => {
     return new Promise<void>((resolve, reject) => {
@@ -93,8 +144,8 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         console.warn('ElevenLabs API failed, using fallback speech synthesis');
         await playAudioFallback(text, lang);
         setIsSpeaking(false);
-        if (isActive) {
-          setTimeout(() => startListening(), 300);
+        if (isActive && currentTurn < maxTurns) {
+          setTimeout(() => startListening(), 200);
         }
         return;
       }
@@ -113,8 +164,10 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       audio.onended = () => {
         setIsSpeaking(false);
         URL.revokeObjectURL(audioUrl);
-        if (isActive) {
-          setTimeout(() => startListening(), 300);
+        if (isActive && currentTurn < maxTurns) {
+          setTimeout(() => startListening(), 200);
+        } else if (currentTurn >= maxTurns) {
+          resetConversation();
         }
       };
 
@@ -127,8 +180,8 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         } catch (fallbackError) {
           console.error('Fallback also failed:', fallbackError);
         }
-        if (isActive) {
-          setTimeout(() => startListening(), 300);
+        if (isActive && currentTurn < maxTurns) {
+          setTimeout(() => startListening(), 200);
         }
       };
 
@@ -141,16 +194,28 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         console.error('Fallback speech synthesis failed:', fallbackError);
       }
       setIsSpeaking(false);
-      if (isActive) {
-        setTimeout(() => startListening(), 500);
+      if (isActive && currentTurn < maxTurns) {
+        setTimeout(() => startListening(), 200);
       }
     }
-  }, [language, isSpeaking, isActive, playAudioFallback]);
+  }, [language, isSpeaking, isActive, currentTurn, maxTurns, playAudioFallback]);
 
   const processTranscript = useCallback(async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isProcessing) return;
+
+    setIsProcessing(true);
+    stopListening();
 
     try {
+      const userMessage: ConversationMessage = {
+        role: 'user',
+        content: text,
+        timestamp: Date.now(),
+      };
+
+      const updatedHistory = [...conversationHistory, userMessage];
+      setConversationHistory(updatedHistory);
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-brain`,
         {
@@ -159,7 +224,14 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
-          body: JSON.stringify({ prompt: text, lang: language, currentPage }),
+          body: JSON.stringify({
+            prompt: text,
+            lang: language,
+            currentPage,
+            conversationHistory: updatedHistory,
+            currentTurn: currentTurn + 1,
+            maxTurns,
+          }),
         }
       );
 
@@ -169,6 +241,16 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
 
       const data: GeminiResponse = await response.json();
       setGeminiResponse(data);
+
+      const assistantMessage: ConversationMessage = {
+        role: 'assistant',
+        content: data.speech,
+        timestamp: Date.now(),
+      };
+
+      setConversationHistory([...updatedHistory, assistantMessage]);
+      setCurrentTurn(prev => prev + 1);
+
       await playAudio(data.speech, language);
     } catch (error) {
       console.error('Error processing transcript:', error);
@@ -176,11 +258,13 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         ? 'Lo siento, no pude procesar tu solicitud. ¿Puedes repetirlo?'
         : 'Sorry, I could not process your request. Can you repeat?';
       await playAudio(errorMessage, language);
+    } finally {
+      setIsProcessing(false);
     }
-  }, [language, currentPage, playAudio]);
+  }, [language, currentPage, conversationHistory, currentTurn, maxTurns, playAudio, isProcessing]);
 
   const startListening = useCallback(() => {
-    if (!isActive || isListening || isSpeaking) return;
+    if (!isActive || isListening || isSpeaking || isProcessing) return;
 
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       console.error('Speech recognition not supported in this browser');
@@ -195,8 +279,8 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
 
     if (!recognitionRef.current) {
       const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = true;
+      recognition.interimResults = true;
       recognition.lang = language === 'es' ? 'es-ES' : 'en-US';
       recognition.maxAlternatives = 1;
 
@@ -205,21 +289,38 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       };
 
       recognition.onresult = (event: any) => {
-        const text = event.results[0][0].transcript;
-        setTranscript(text);
-        processTranscript(text);
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            interimTranscriptRef.current += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
       };
 
       recognition.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
-        if (isActive && event.error !== 'no-speech') {
+        if (isActive && event.error !== 'no-speech' && currentTurn < maxTurns) {
           setTimeout(() => startListening(), 1000);
         }
       };
 
       recognition.onend = () => {
         setIsListening(false);
+        if (isActive && !isSpeaking && !isProcessing && currentTurn < maxTurns) {
+          setTimeout(() => {
+            try {
+              if (recognitionRef.current) {
+                recognitionRef.current.start();
+              }
+            } catch (error) {
+              console.error('Error restarting recognition:', error);
+            }
+          }, 100);
+        }
       };
 
       recognitionRef.current = recognition;
@@ -231,7 +332,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       console.error('Error starting recognition:', error);
       setIsListening(false);
     }
-  }, [isActive, isListening, isSpeaking, language, processTranscript]);
+  }, [isActive, isListening, isSpeaking, isProcessing, language, currentTurn, maxTurns]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
@@ -244,24 +345,45 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
     setIsListening(false);
   }, []);
 
+  const resetConversation = useCallback(() => {
+    setIsActive(false);
+    stopListening();
+    vad.stopVAD();
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    setIsSpeaking(false);
+    setIsProcessing(false);
+    setConversationHistory([]);
+    setCurrentTurn(0);
+    setTranscript('');
+    setSpeechResponse('');
+    setVolumeLevel(0);
+    interimTranscriptRef.current = '';
+    shouldProcessRef.current = false;
+  }, [stopListening, vad]);
+
   const toggleActive = useCallback(async () => {
     const newActiveState = !isActive;
-    setIsActive(newActiveState);
 
     if (!newActiveState) {
-      stopListening();
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      setIsSpeaking(false);
+      resetConversation();
     } else {
+      setIsActive(true);
+      setConversationHistory([]);
+      setCurrentTurn(0);
+
+      await vad.startVAD();
+
       const greeting = language === 'es'
         ? 'Hola, soy Hidri, tu asistente de Voz Hídrica. ¿En qué puedo ayudarte hoy?'
         : 'Hello, I am Hidri, your Voz Hídrica assistant. How can I help you today?';
       await playAudio(greeting, language);
     }
-  }, [isActive, stopListening, language, playAudio]);
+  }, [isActive, language, playAudio, vad, resetConversation]);
 
   useEffect(() => {
     return () => {
@@ -275,8 +397,13 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
       if (audioRef.current) {
         audioRef.current.pause();
       }
+      vad.stopVAD();
     };
-  }, []);
+  }, [vad]);
+
+  if (preferencesLoading) {
+    return null;
+  }
 
   return (
     <VoiceContext.Provider
@@ -289,6 +416,10 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         speechResponse,
         currentPage,
         geminiResponse,
+        conversationHistory,
+        currentTurn,
+        maxTurns,
+        volumeLevel,
         setLanguage,
         setCurrentPage,
         startListening,
