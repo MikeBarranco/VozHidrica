@@ -9,10 +9,11 @@ export default function RewardsPage() {
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4"
+          className="flex items-center gap-2 px-4 py-3 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4 font-gotham font-medium text-14"
           aria-label="Volver al inicio"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <span className="text-gray-700">Volver</span>
         </button>
 
         <h1 className="font-gotham font-bold text-32 text-gray-900 mb-4">
@@ -63,14 +64,14 @@ export default function RewardsPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Gift className="w-8 h-8 text-purple-600" />
+              <div className="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Gift className="w-8 h-8 text-cyan-600" />
               </div>
               <h3 className="font-gotham font-bold text-16 text-gray-900 mb-2">Referidos</h3>
               <p className="font-gotham font-book text-13 text-gray-600 mb-3">
                 Invita a amigos
               </p>
-              <p className="font-gotham font-bold text-20 text-purple-600">200 pts</p>
+              <p className="font-gotham font-bold text-20 text-cyan-600">200 pts</p>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 text-center">

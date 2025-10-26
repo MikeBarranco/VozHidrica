@@ -36,7 +36,7 @@ export default function ChallengesPage() {
       case 'weekly':
         return 'bg-blue-100 text-blue-800';
       case 'monthly':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-orange-100 text-orange-800';
       case 'seasonal':
         return 'bg-orange-100 text-orange-800';
       case 'community':
@@ -86,10 +86,11 @@ export default function ChallengesPage() {
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6"
+          className="flex items-center gap-2 px-4 py-3 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6 font-gotham font-medium text-14"
           aria-label="Volver al inicio"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <span className="text-gray-700">Volver</span>
         </button>
 
         <div className="mb-8">
@@ -120,7 +121,7 @@ export default function ChallengesPage() {
             <p className="font-gotham font-book text-12 opacity-75 mt-1">Retos logrados</p>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white">
+          <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-gotham font-medium text-14 opacity-90">Disponibles</h3>
               <Trophy className="w-5 h-5" />
@@ -193,8 +194,8 @@ export default function ChallengesPage() {
                     <span className="font-gotham font-bold text-14 text-gray-900">{challenge.target_value}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-purple-500" />
-                    <span className="font-gotham font-bold text-16 text-purple-600">{challenge.reward_points} pts</span>
+                    <Award className="w-5 h-5 text-orange-500" />
+                    <span className="font-gotham font-bold text-16 text-orange-600">{challenge.reward_points} pts</span>
                   </div>
                 </div>
                 <button
@@ -244,8 +245,8 @@ export default function ChallengesPage() {
                       <span className="font-gotham font-bold text-14">{challenge.target_value}%</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-purple-500" />
-                      <span className="font-gotham font-bold text-16 text-purple-600">{challenge.reward_points} pts</span>
+                      <Award className="w-5 h-5 text-orange-500" />
+                      <span className="font-gotham font-bold text-16 text-orange-600">{challenge.reward_points} pts</span>
                     </div>
                   </div>
                 </div>
@@ -283,8 +284,8 @@ export default function ChallengesPage() {
                   </div>
                   <div className="flex items-center justify-center">
                     <div className="flex items-center gap-2">
-                      <Award className="w-6 h-6 text-purple-500" />
-                      <span className="font-gotham font-bold text-18 text-purple-600">+{challenge.reward_points} puntos ganados</span>
+                      <Award className="w-6 h-6 text-orange-500" />
+                      <span className="font-gotham font-bold text-18 text-orange-600">+{challenge.reward_points} puntos ganados</span>
                     </div>
                   </div>
                 </div>

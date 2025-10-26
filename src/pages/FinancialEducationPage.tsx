@@ -161,10 +161,11 @@ export default function FinancialEducationPage() {
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6"
+          className="flex items-center gap-2 px-4 py-3 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6 font-gotham font-medium text-14"
           aria-label="Volver al inicio"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <span className="text-gray-700">Volver</span>
         </button>
 
         <div className="mb-8">
@@ -188,7 +189,7 @@ export default function FinancialEducationPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white">
+          <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-gotham font-medium text-14 opacity-90">Puntos Ganados</h3>
               <Trophy className="w-5 h-5" />
@@ -272,8 +273,8 @@ export default function FinancialEducationPage() {
                       <span className="font-gotham font-book text-13">{module.estimated_minutes} min</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Award className="w-4 h-4 text-purple-500" />
-                      <span className="font-gotham font-bold text-13 text-purple-600">{module.points_reward} pts</span>
+                      <Award className="w-4 h-4 text-orange-500" />
+                      <span className="font-gotham font-bold text-13 text-orange-600">{module.points_reward} pts</span>
                     </div>
                   </div>
 

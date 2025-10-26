@@ -40,10 +40,11 @@ export default function WaterDashboardPage() {
         <div className="mb-8">
           <button
             onClick={() => navigate('/home')}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4"
+            className="flex items-center gap-2 px-4 py-3 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4 font-gotham font-medium text-14"
             aria-label="Volver al inicio"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
+            <ArrowLeft className="w-6 h-6 text-gray-700" />
+            <span className="text-gray-700">Volver</span>
           </button>
           <div className="flex items-center justify-between">
             <div>
@@ -88,7 +89,7 @@ export default function WaterDashboardPage() {
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white">
+          <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-gotham font-medium text-14 opacity-90">Puntos Ganados</h3>
               <Trophy className="w-5 h-5" />
@@ -199,7 +200,7 @@ export default function WaterDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
             <h2 className="font-gotham font-bold text-20 text-gray-900 mb-4 flex items-center gap-2">
-              <Award className="w-6 h-6 text-purple-600" />
+              <Award className="w-6 h-6 text-orange-600" />
               Recompensas por Racha
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

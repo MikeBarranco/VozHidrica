@@ -1,28 +1,5 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 
-interface SpeechSynthesisUtterance {
-  text: string;
-  lang: string;
-  rate: number;
-  pitch: number;
-  volume: number;
-  onend: (() => void) | null;
-  onerror: ((event: any) => void) | null;
-}
-
-interface SpeechSynthesis {
-  speak: (utterance: any) => void;
-  cancel: () => void;
-  speaking: boolean;
-}
-
-declare global {
-  interface Window {
-    speechSynthesis: SpeechSynthesis;
-    SpeechSynthesisUtterance: new () => SpeechSynthesisUtterance;
-  }
-}
-
 interface GeminiResponse {
   intent: 'navigate' | 'read' | 'query';
   route?: string;
@@ -117,7 +94,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         await playAudioFallback(text, lang);
         setIsSpeaking(false);
         if (isActive) {
-          setTimeout(() => startListening(), 500);
+          setTimeout(() => startListening(), 300);
         }
         return;
       }
@@ -137,7 +114,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         setIsSpeaking(false);
         URL.revokeObjectURL(audioUrl);
         if (isActive) {
-          setTimeout(() => startListening(), 500);
+          setTimeout(() => startListening(), 300);
         }
       };
 
@@ -151,7 +128,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
           console.error('Fallback also failed:', fallbackError);
         }
         if (isActive) {
-          setTimeout(() => startListening(), 500);
+          setTimeout(() => startListening(), 300);
         }
       };
 

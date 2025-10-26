@@ -13,10 +13,11 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4"
+          className="flex items-center gap-2 px-4 py-3 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-4 font-gotham font-medium text-14"
           aria-label="Volver al inicio"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <span className="text-gray-700">Volver</span>
         </button>
 
         <h1 className="font-gotham font-bold text-32 text-gray-900 mb-8">
@@ -68,8 +69,8 @@ export default function SettingsPage() {
 
           <div className="bg-white rounded-xl shadow-md p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-purple-100 rounded-full p-3">
-                <Mic className="w-6 h-6 text-purple-600" />
+              <div className="bg-blue-100 rounded-full p-3">
+                <Mic className="w-6 h-6 text-blue-600" />
               </div>
               <h2 className="font-gotham font-bold text-20 text-gray-900">Asistente de Voz</h2>
             </div>

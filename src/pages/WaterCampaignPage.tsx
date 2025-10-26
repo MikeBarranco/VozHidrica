@@ -15,10 +15,11 @@ export default function WaterCampaignPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6"
+          className="flex items-center gap-2 px-4 py-3 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6 font-gotham font-medium text-14"
           aria-label="Volver al inicio"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <span className="text-gray-700">Volver</span>
         </button>
 
         <div className="text-center mb-12">

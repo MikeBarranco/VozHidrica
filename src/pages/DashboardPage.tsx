@@ -20,17 +20,18 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6"
+          className="flex items-center gap-2 px-4 py-3 rounded-full bg-white hover:bg-gray-100 shadow-md transition-colors mb-6 font-gotham font-medium text-14"
           aria-label="Volver al inicio"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <span className="text-gray-700">Volver</span>
         </button>
         <h1 className="font-gotham font-bold text-32 text-gray-900 mb-8">
           Panel de Control
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white card-hover animate-slideInUp">
+          <div className="bg-gradient-to-br from-[#EB0029] to-orange-500 rounded-xl shadow-lg p-6 text-white card-hover animate-slideInUp">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-gotham font-medium text-14 opacity-90">Eco-Puntos</h3>
               <Trophy className="w-5 h-5" />
@@ -158,9 +159,9 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4">
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4">
                 <p className="font-gotham font-medium text-14 text-gray-700 mb-2">Eco-Puntos Ganados</p>
-                <p className="font-gotham font-bold text-32 text-purple-600">
+                <p className="font-gotham font-bold text-32 text-orange-600">
                   +{Math.floor(Math.max(0, waterLastMonth - waterThisMonth) * 10)} pts
                 </p>
                 <p className="font-gotham font-book text-12 text-gray-600 mt-1">

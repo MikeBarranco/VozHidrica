@@ -24,7 +24,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm sticky top-0 z-40">
+      <header className="bg-[#EB0029] shadow-lg sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -39,7 +39,7 @@ export default function HomePage() {
                   x="75"
                   y="25"
                   textAnchor="middle"
-                  fill="#EB0029"
+                  fill="white"
                   fontSize="20"
                   fontWeight="bold"
                   fontFamily="Arial, sans-serif"
@@ -48,21 +48,21 @@ export default function HomePage() {
                 </text>
               </svg>
               <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-gray-800">Voz Hídrica</h1>
+                <h1 className="text-xl font-bold text-white">Voz Hídrica</h1>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg shadow-md">
+              <div className="hidden md:flex items-center gap-3 bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg shadow-md backdrop-blur-sm">
                 <Trophy className="w-5 h-5" />
                 <div className="text-left">
                   <div className="font-gotham font-bold text-14">{ecoPoints.toLocaleString()} pts</div>
                   <div className="font-gotham font-book text-10 opacity-90">${moneyValue.toFixed(2)} MXN</div>
                 </div>
               </div>
-              <span className="hidden sm:inline text-sm text-gray-600">{user?.email}</span>
+              <span className="hidden sm:inline text-sm text-white opacity-90">{user?.email}</span>
               <button
                 onClick={signOut}
-                className="flex items-center gap-2 px-4 py-2 bg-[#EB0029] text-white rounded-lg hover:bg-[#c9022f] transition-colors duration-300"
+                className="flex items-center gap-2 px-4 py-2 bg-white text-[#EB0029] rounded-lg hover:bg-opacity-90 transition-all duration-300 font-gotham font-bold text-14 shadow-md"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Cerrar Sesión</span>
@@ -75,7 +75,7 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white">
+            <div className="bg-gradient-to-br from-[#EB0029] to-orange-500 rounded-xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-gotham font-medium text-14 opacity-90">Eco-Puntos</h3>
                 <Trophy className="w-5 h-5" />
@@ -144,9 +144,9 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => navigate('/rewards')}
-              className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-3 border-2 border-transparent hover:border-purple-500"
+              className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-3 border-2 border-transparent hover:border-orange-500"
             >
-              <Gift className="w-8 h-8 text-purple-600" />
+              <Gift className="w-8 h-8 text-orange-600" />
               <span className="font-gotham font-bold text-14 text-gray-900">Recompensas</span>
             </button>
             <button
