@@ -1,7 +1,9 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+// --- INICIO BYPASS HACKATHON ---
+import { createContext, useContext, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+// import { supabase } from '../lib/supabase'; // No lo necesitamos para el bypass
 
+// --- Las interfaces no cambian ---
 interface UserProfile {
   username: string;
   fullName: string;
@@ -21,9 +23,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // 1. Decimos que no hay usuario
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  
+  // 2. ¡IMPORTANTE! Decimos que YA TERMINÓ de cargar
+  const [loading, setLoading] = useState(false);
 
+  // 3. Comentamos TODO el useEffect que usaba supabase.auth y causaba el error
+  /*
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -38,82 +45,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+  */
 
-  const signIn = async (username: string, password: string) => {
-    try {
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('email')
-        .eq('username', username)
-        .maybeSingle();
-
-      if (profileError || !profileData) {
-        return { error: 'Nombre de usuario o contraseña incorrectos' };
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: profileData.email,
-        password,
-      });
-
-      if (error) {
-        return { error: 'Nombre de usuario o contraseña incorrectos' };
-      }
-
-      if (data.user) {
-        setUser(data.user);
-      }
-
-      return { error: null };
-    } catch (error) {
-      return { error: 'Error al iniciar sesión. Inténtalo de nuevo.' };
-    }
+  // 4. Desactivamos las funciones de login/registro para que no crasheen
+  const signIn = async () => {
+    console.warn('BYPASS: signIn desactivado');
+    return { error: 'Bypass: Función desactivada' };
   };
 
-  const signUp = async (password: string, profile: UserProfile) => {
-    try {
-      const { data: existingUsername } = await supabase
-        .from('user_profiles')
-        .select('username')
-        .eq('username', profile.username)
-        .maybeSingle();
-
-      if (existingUsername) {
-        return { error: 'Este nombre de usuario ya está en uso' };
-      }
-
-      const { data, error } = await supabase.auth.signUp({
-        email: profile.email,
-        password,
-      });
-
-      if (error) {
-        if (error.message.includes('already registered')) {
-          return { error: 'Este correo electrónico ya está registrado' };
-        }
-        return { error: error.message };
-      }
-
-      if (data.user) {
-        await supabase.from('user_profiles').insert({
-          user_id: data.user.id,
-          username: profile.username,
-          email: profile.email,
-          full_name: profile.fullName,
-          curp: profile.curp,
-          address: profile.address,
-        });
-        setUser(data.user);
-      }
-
-      return { error: null };
-    } catch (error) {
-      return { error: 'Error al registrar usuario. Inténtalo de nuevo.' };
-    }
+  const signUp = async () => {
+    console.warn('BYPASS: signUp desactivado');
+    return { error: 'Bypass: Función desactivada' };
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    console.warn('BYPASS: signOut desactivado');
     setUser(null);
   };
 
@@ -131,3 +77,4 @@ export function useAuth() {
   }
   return context;
 }
+// --- FIN BYPASS HACKATHON ---

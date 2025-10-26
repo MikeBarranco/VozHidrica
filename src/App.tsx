@@ -51,9 +51,14 @@ function VoiceNavigationHandler() {
   return null;
 }
 
+// --- INICIO DEL CAMBIO (BYPASS) ---
+// Modifiqué esta función para que nos deje pasar
+// a cualquier ruta sin iniciar sesión.
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuth(); // Sigue leyendo esto
 
+  /*
+  // He comentado esta lógica de protección:
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -67,9 +72,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
+  */
 
+  // Ahora simplemente dejamos pasar
   return <>{children}</>;
 }
+// --- FIN DEL CAMBIO (BYPASS) ---
+
 
 function AppContent() {
   return (
