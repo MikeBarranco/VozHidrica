@@ -1,16 +1,18 @@
 import { useNavigate } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Gift, Leaf, PiggyBank, Settings, Trophy, Target, BookOpen, Droplet } from 'lucide-react';
+import { LogOut, LayoutDashboard, Gift, Leaf, PiggyBank, Settings, Trophy, Target, BookOpen, Droplet, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCarouselBanners, useSocialLinks } from '../hooks/useSocialData';
 import { useEcoPoints } from '../hooks/useEcoPoints';
 import { useWaterTracking } from '../hooks/useWaterTracking';
+import { useUserProfile } from '../hooks/useUserProfile';
 import Carousel from '../components/Carousel';
 import SocialLinksBar from '../components/SocialLinksBar';
 import { SkeletonBanner, SkeletonCard } from '../components/SkeletonLoader';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
+  const { displayName } = useUserProfile();
   const { banners, loading: bannersLoading } = useCarouselBanners();
   const { links, loading: linksLoading } = useSocialLinks();
   const { balance, convertPointsToMoney } = useEcoPoints();
@@ -52,14 +54,6 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-3 bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg shadow-md backdrop-blur-sm">
-                <Trophy className="w-5 h-5" />
-                <div className="text-left">
-                  <div className="font-gotham font-bold text-14">{ecoPoints.toLocaleString()} pts</div>
-                  <div className="font-gotham font-book text-10 opacity-90">${moneyValue.toFixed(2)} MXN</div>
-                </div>
-              </div>
-              <span className="hidden sm:inline text-sm text-white opacity-90">{user?.email}</span>
               <button
                 onClick={signOut}
                 className="flex items-center gap-2 px-4 py-2 bg-white text-[#EB0029] rounded-lg hover:bg-opacity-90 transition-all duration-300 font-gotham font-bold text-14 shadow-md"
@@ -67,6 +61,19 @@ export default function HomePage() {
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Cerrar Sesión</span>
               </button>
+              <div className="hidden md:flex items-center gap-3 bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg shadow-md backdrop-blur-sm">
+                <Trophy className="w-5 h-5" />
+                <div className="text-left">
+                  <div className="font-gotham font-bold text-14">{ecoPoints.toLocaleString()} pts</div>
+                  <div className="font-gotham font-book text-10 opacity-90">${moneyValue.toFixed(2)} MXN</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 bg-white bg-opacity-20 text-white px-3 py-2 rounded-lg shadow-md backdrop-blur-sm">
+                <div className="bg-white bg-opacity-30 rounded-full p-1.5">
+                  <User className="w-4 h-4" />
+                </div>
+                <span className="hidden sm:inline text-sm font-gotham font-medium">{displayName}</span>
+              </div>
             </div>
           </div>
         </div>
