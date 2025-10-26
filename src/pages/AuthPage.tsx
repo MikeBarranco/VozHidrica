@@ -289,6 +289,18 @@ export default function AuthPage() {
               />
             )}
 
+            {isLogin && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  className="font-gotham font-medium text-13 lg:text-14 text-[#EB0029] hover:underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
+            )}
+
             {errors.general && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="font-gotham font-book text-12 lg:text-14 text-banorte-red text-center">

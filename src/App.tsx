@@ -8,6 +8,9 @@ import VoiceControlButton from './components/VoiceControlButton';
 
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const TwoFactorAuthPage = lazy(() => import('./pages/TwoFactorAuthPage'));
 const HomePage = lazy(() => import('./pages/HomePage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const RewardsPage = lazy(() => import('./pages/RewardsPage'));
@@ -78,6 +81,9 @@ function AppContent() {
         <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/2fa" element={<TwoFactorAuthPage />} />
         <Route
           path="/home"
           element={
