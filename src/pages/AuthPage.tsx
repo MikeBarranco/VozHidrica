@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import { useAuth } from '../contexts/AuthContext';
@@ -24,6 +25,7 @@ export default function AuthPage() {
   const [videoError, setVideoError] = useState(false);
 
   const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -91,6 +93,8 @@ export default function AuthPage() {
         const { error } = await signIn(email, password);
         if (error) {
           setErrors({ general: error });
+        } else {
+          navigate('/home');
         }
       } else {
         const { error } = await signUp(email, password, {
@@ -100,6 +104,8 @@ export default function AuthPage() {
         });
         if (error) {
           setErrors({ general: error });
+        } else {
+          navigate('/home');
         }
       }
     } finally {

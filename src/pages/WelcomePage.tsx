@@ -35,8 +35,8 @@ export default function WelcomePage({ onContinue }: WelcomePageProps) {
       toggleActive();
 
       const welcomeMessage = language === 'es'
-        ? '¡Hola! Soy Hidri, tu asistente de Voz Hídrica. Estoy aquí para ayudarte a gestionar tu consumo de agua y ganar recompensas. ¿En qué puedo ayudarte hoy?'
-        : 'Hello! I am Hidri, your Voz Hídrica assistant. I am here to help you manage your water consumption and earn rewards. How can I help you today?';
+        ? 'Hola, mi nombre es Hidri y estoy aquí para ayudarte. Si quieres que te apoye, puedo llevarte al login para que inicies sesión, o puedo explicarte sobre nuestros servicios de ahorro de agua y recompensas. ¿En qué te puedo ayudar?'
+        : 'Hello, my name is Hidri and I am here to help you. If you want my support, I can take you to login to sign in, or I can explain our water savings and rewards services. How can I help you?';
 
       await playAudio(welcomeMessage, language);
       toast.success('Asistente de voz activado');
@@ -144,7 +144,7 @@ export default function WelcomePage({ onContinue }: WelcomePageProps) {
 
       <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 lg:bottom-30 lg:right-30 z-10">
         <Button variant="welcome" onClick={handleMeetHidri} disabled={isActivating}>
-          {isActivating ? 'Activando...' : 'Conoce a Hidri'}
+          {isActivating ? 'Activando...' : 'Empieza'}
         </Button>
       </div>
     </div>

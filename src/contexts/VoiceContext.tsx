@@ -73,8 +73,8 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         window.speechSynthesis.cancel();
         const utterance = new window.SpeechSynthesisUtterance(text);
         utterance.lang = lang === 'es' ? 'es-ES' : 'en-US';
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
         utterance.volume = 1.0;
 
         utterance.onend = () => {

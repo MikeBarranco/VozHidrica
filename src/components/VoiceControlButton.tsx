@@ -16,7 +16,7 @@ export default function VoiceControlButton() {
     if (isSpeaking) {
       return {
         icon: <Volume2 className="w-6 h-6 animate-pulse" />,
-        text: 'Hidra está hablando...',
+        text: 'Hidri está hablando...',
         bgColor: 'bg-blue-500',
       };
     }
@@ -78,7 +78,7 @@ export default function VoiceControlButton() {
               <Mic className="w-5 h-5 text-red-500" aria-hidden="true" />
             )}
             <span className="text-sm font-medium text-gray-700">
-              {isSpeaking ? 'Hidra habla' : 'Te escucho'}
+              {isSpeaking ? 'Hidri habla' : ''}
             </span>
           </div>
           {isSpeaking && (
@@ -92,7 +92,7 @@ export default function VoiceControlButton() {
           )}
           {isListening && (
             <div className="flex items-center justify-center" aria-label="Micrófono activo">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+              <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
         </div>

@@ -12,8 +12,8 @@ export default function LandingPage() {
     toggleActive();
 
     const welcomeMessage = language === 'es'
-      ? 'Hola, bienvenido a Voz Hídrica. Soy Hidra, tu asistente bancario de voz. ¿En qué te puedo ayudar? Puedes decir: llévame al login, muéstrame las recompensas, o léeme la página.'
-      : 'Hello, welcome to Voz Hídrica. I am Hydra, your voice banking assistant. How can I help you? You can say: take me to login, show me rewards, or read the page.';
+      ? 'Hola, bienvenido a Voz Hídrica. Soy Hidri, tu asistente bancario de voz. ¿En qué te puedo ayudar? Puedes decir: llévame al login, muéstrame las recompensas, o léeme la página.'
+      : 'Hello, welcome to Voz Hídrica. I am Hidri, your voice banking assistant. How can I help you? You can say: take me to login, show me rewards, or read the page.';
 
     await playAudio(welcomeMessage, language);
 
